@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>boutique__mimou</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #008751;
+            --primary-dark: #00683e;
+            --accent: #e30613;
+            --dark: #1e293b;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--dark);
+            padding-bottom: 60px;
+        }
+
+        /* Top Announcement Bar */
+        .announcement-bar {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            text-align: center;
+            padding: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .trust-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            background: #f1f5f9;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #00875115 0%, #e3061310 100%);
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+            border-radius: var(--radius);
+        }
+
+        .hero h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 18px;
+        }
+
+        @media (max-width: 1200px) {
+            .products-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        @media (max-width: 992px) {
+            .products-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        }
+        @media (max-width: 480px) {
+            .products-grid { grid-template-columns: repeat(1, 1fr); }
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .card-info {
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-grow: 1;
+        }
+
+        .rating {
+            color: #f59e0b;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .price-container {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin: 8px 0 12px 0;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .old-price {
+            font-size: 12px;
+            text-decoration: line-through;
+            color: #94a3b8;
+        }
+
+        .view-btn {
+            background: #f1f5f9;
+            color: var(--dark);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .product-card:hover .view-btn {
+            background: var(--primary);
+            color: white;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: 0.2s;
+        }
+
+        .back-btn:hover {
+            background: var(--border);
+        }
+
+        .product-detail-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            background: #fff;
+            padding: 30px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        }
+
+        @media (max-width: 768px) {
+            .product-detail-layout {
+                grid-template-columns: 1fr;
+                padding: 16px;
+            }
+        }
+
+        .viewer-container {
+            position: relative;
+            width: 100%;
+            height: 380px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+
+        .viewer-main-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.85);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+        }
+
+        .nav-arrow:hover {
+            background: #fff;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .nav-arrow.prev { right: 12px; }
+        .nav-arrow.next { left: 12px; }
+
+        .viewer-thumbs {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .viewer-thumb {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            opacity: 0.6;
+            transition: all 0.2s;
+        }
+
+        .viewer-thumb.active {
+            border-color: var(--primary);
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        .detail-info h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .detail-description {
+            color: #64748b;
+            line-height: 1.8;
+            margin: 20px 0;
+            font-size: 15px;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .features-list li {
+            padding: 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .order-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 18px;
+            font-weight: 800;
+            box-shadow: 0 4px 15px rgba(0, 135, 81, 0.3);
+            transition: all 0.2s;
+        }
+
+        .order-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 135, 81, 0.4);
+        }
+
+        .order-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Modal / Form */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 480px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            background-color: #f8fafc;
+        }
+
+        .radio-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .radio-option {
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            background: #f8fafc;
+        }
+
+        .summary {
+            background: #f1f5f9;
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .summary div {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .total {
+            font-weight: 800;
+            font-size: 18px;
+            color: var(--accent);
+            border-top: 1px solid #cbd5e1;
+            padding-top: 8px;
+        }
+
+        /* رسالة النجاح بعد إرسال الطلب */
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 20px 10px;
+        }
+
+        .success-message h3 {
+            color: var(--primary);
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .success-message p {
+            color: #64748b;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="announcement-bar">
+        ⚡ التوصيل متوفر لـ 58 ولاية — الدفع عند الاستلام يدًا بيد!
+    </div>
+
+    <header>
+        <div class="logo" onclick="showCatalog()">boutique__mimou</div>
+        <div class="trust-badge">🇩🇿 متجر جزائري موثوق</div>
+    </header>
+
+    <div class="container">
+        <!-- 1. صفحة المنتجات الرئيسية -->
+        <section id="catalog-page" class="page-section active">
+            <div class="hero">
+                <h1>تشكيلة منتجاتنا المميزة</h1>
+                <p>اختر منتجك المفضل لمعاينة التفاصيل واختيار التوصيل لولايتك</p>
+            </div>
+            <div class="products-grid" id="products-container"></div>
+        </section>
+
+        <!-- 2. صفحة تفاصيل المنتج والتنقل في الصور -->
+        <section id="detail-page" class="page-section">
+            <button class="back-btn" onclick="showCatalog()">➔ العودة للمتجر</button>
+            <div class="product-detail-layout">
+                <div class="gallery-wrapper">
+                    <div class="viewer-container">
+                        <img id="viewer-main" class="viewer-main-img" src="" alt="صورة المنتج">
+                        <button class="nav-arrow prev" onclick="navigateImage(1)">❯</button>
+                        <button class="nav-arrow next" onclick="navigateImage(-1)">❮</button>
+                    </div>
+                    <div class="viewer-thumbs" id="viewer-thumbs-container"></div>
+                </div>
+
+                <div class="detail-info">
+                    <div class="rating">★★★★★ (4.9/5 بناءً على تقييمات العملاء)</div>
+                    <h2 id="detail-title">عنوان المنتج</h2>
+                    <div class="price-container">
+                        <span class="product-price" id="detail-price">0 د.ج</span>
+                        <span class="old-price" id="detail-old-price">0 د.ج</span>
+                    </div>
+                    <p class="detail-description" id="detail-desc">وصف المنتج...</p>
+                    
+                    <ul class="features-list">
+                        <li>✅ ضمان الجودة 100%</li>
+                        <li>✅ إمكانية المعاينة قبل الدفع</li>
+                        <li>✅ توصيل سريع حتى باب المنزل</li>
+                    </ul>
+
+                    <button class="order-btn" onclick="openOrderModal()">طلب المنتج الآن 🚚</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- نافذة طلب المنتج -->
+    <div class="modal" id="order-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            
+            <div id="form-container">
+                <h3 id="modal-product-title" style="margin-bottom: 20px; font-weight:800;">إتمام الطلب</h3>
+                <form id="checkout-form" onsubmit="submitOrderToTelegram(event)">
+                    <div class="form-group">
+                        <label>الاسم الكامل</label>
+                        <input type="text" id="cust-name" required placeholder="مثال: محمد بن علي">
+                    </div>
+                    <div class="form-group">
+                        <label>رقم الهاتف</label>
+                        <input type="tel" id="cust-phone" required placeholder="06XX XX XX XX">
+                    </div>
+                    <div class="form-group">
+                        <label>الولاية</label>
+                        <select id="wilaya-select" onchange="updateShippingCost()" required>
+                            <option value="">اختر ولايتك...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>مكان الاستلام</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="shipping_type" value="home" checked onchange="updateShippingCost()">
+                                توصيل للمنزل
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="shipping_type" value="desk" onchange="updateShippingCost()">
+                                توصيل للمكتب
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>العنوان التفصيلي / البلدية</label>
+                        <input type="text" id="cust-address" required placeholder="مثال: بلدية أولاد فايت">
+                    </div>
+                    <!-- ✍️ مكان إضافة الملاحظة -->
+                    <div class="form-group">
+                        <label>ملاحظة (اختياري)</label>
+                        <textarea id="cust-note" rows="2" placeholder="أكتب المقاس، اللون المطلوب أو أي ملاحظات أخرى..."></textarea>
+                    </div>
+                    
+                    <div class="summary">
+                        <div>
+                            <span>سعر المنتج:</span>
+                            <span id="summary-price">0 د.ج</span>
+                        </div>
+                        <div>
+                            <span>مصاريف التوصيل:</span>
+                            <span id="summary-shipping">0 د.ج</span>
+                        </div>
+                        <div class="total">
+                            <span>المجموع الإجمالي:</span>
+                            <span id="summary-total">0 د.ج</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="order-btn" style="margin-top: 20px;">تأكيد الطلب 🚚</button>
+                </form>
+            </div>
+
+            <!-- رسالة شكر تظهر للزبون بعد نجاح الطلب -->
+            <div id="success-box" class="success-message">
+                <h3>🎉 تم إرسال طلبك بنجاح!</h3>
+                <p>شكراً لثقتك بنا. سنتصل بك قريباً عبر الهاتف لتأكيد الطلب وبدء عملية الشحن.</p>
+                <button class="order-btn" onclick="closeModal()">حسناً، إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // ⚙️ إعدادات تليجرام (ضع معلوماتك هنا)
+        // ==========================================
+        const TELEGRAM_BOT_TOKEN = "8709434736:AAGRhJuBNaEjG8H2Bbqwl2g0W-suhFAA2xo"; // التوكن الخاص بالبوت
+        const TELEGRAM_CHAT_ID = "8275297896";     // المعرف الخاص بحسابك
+
+        // صور توضيحية افتراضية
+        const IMG_1 = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="500" height="400" viewBox="0 0 500 400"><rect width="100%" height="100%" fill="%23008751"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="28" font-family="sans-serif">الصورة الأولى</text></svg>';
+        const IMG_2 = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="500" height="400" viewBox="0 0 500 400"><rect width="100%" height="100%" fill="%231e293b"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="28" font-family="sans-serif">الصورة الثانية</text></svg>';
+        const IMG_3 = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="500" height="400" viewBox="0 0 500 400"><rect width="100%" height="100%" fill="%23e30613"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="28" font-family="sans-serif">الصورة الثالثة</text></svg>';
+
+        /* 58 ولاية جزائرية كاملاً مع أسعار توصيل المنزل والمكتب */
+        const WILAYAS = [
+            { id: 1, name: "01 - أدرار", home: 1000, desk: 600 },
+            { id: 2, name: "02 - الشلف", home: 600, desk: 400 },
+            { id: 3, name: "03 - الأغواط", home: 800, desk: 500 },
+            { id: 4, name: "04 - أم البواقي", home: 700, desk: 450 },
+            { id: 5, name: "05 - باتنة", home: 700, desk: 450 },
+            { id: 6, name: "06 - بجاية", home: 650, desk: 400 },
+            { id: 7, name: "07 - بسكرة", home: 800, desk: 500 },
+            { id: 8, name: "08 - بشار", home: 1000, desk: 650 },
+            { id: 9, name: "09 - البليدة", home: 500, desk: 350 },
+            { id: 10, name: "10 - البويرة", home: 600, desk: 400 },
+            { id: 11, name: "11 - تمنراست", home: 1400, desk: 900 },
+            { id: 12, name: "12 - تبسة", home: 750, desk: 500 },
+            { id: 13, name: "13 - تلمسان", home: 700, desk: 450 },
+            { id: 14, name: "14 - تيارت", home: 650, desk: 400 },
+            { id: 15, name: "15 - تيزي وزو", home: 600, desk: 400 },
+            { id: 16, name: "16 - الجزائر", home: 400, desk: 250 },
+            { id: 17, name: "17 - الجلفة", home: 750, desk: 500 },
+            { id: 18, name: "18 - جيجل", home: 650, desk: 400 },
+            { id: 19, name: "19 - سطيف", home: 600, desk: 400 },
+            { id: 20, name: "20 - سعيدة", home: 700, desk: 450 },
+            { id: 21, name: "21 - سكيكدة", home: 650, desk: 400 },
+            { id: 22, name: "22 - سيدي بلعباس", home: 700, desk: 450 },
+            { id: 23, name: "23 - عنابة", home: 650, desk: 400 },
+            { id: 24, name: "24 - قالمة", home: 700, desk: 450 },
+            { id: 25, name: "25 - قسنطينة", home: 600, desk: 400 },
+            { id: 26, name: "26 - المدية", home: 600, desk: 400 },
+            { id: 27, name: "27 - مستغانم", home: 650, desk: 400 },
+            { id: 28, name: "28 - المسيلة", home: 700, desk: 450 },
+            { id: 29, name: "29 - معسكر", home: 700, desk: 450 },
+            { id: 30, name: "30 - ورقلة", home: 900, desk: 600 },
+            { id: 31, name: "31 - وهران", home: 600, desk: 400 },
+            { id: 32, name: "32 - البيض", home: 900, desk: 600 },
+            { id: 33, name: "33 - إليزي", home: 1400, desk: 900 },
+            { id: 34, name: "34 - برج بوعريريج", home: 600, desk: 400 },
+            { id: 35, name: "35 - بومرداس", home: 500, desk: 350 },
+            { id: 36, name: "36 - الطارف", home: 700, desk: 450 },
+            { id: 37, name: "37 - تندوف", home: 1400, desk: 900 },
+            { id: 38, name: "38 - تسمسيلت", home: 700, desk: 450 },
+            { id: 39, name: "39 - الوادي", home: 900, desk: 600 },
+            { id: 40, name: "40 - خنشلة", home: 750, desk: 500 },
+            { id: 41, name: "41 - سوق أهراس", home: 750, desk: 500 },
+            { id: 42, name: "42 - تيبازة", home: 500, desk: 350 },
+            { id: 43, name: "43 - ميلة", home: 650, desk: 400 },
+            { id: 44, name: "44 - عين الدفلى", home: 600, desk: 400 },
+            { id: 45, name: "45 - النعامة", home: 900, desk: 600 },
+            { id: 46, name: "46 - عين تموشنت", home: 700, desk: 450 },
+            { id: 47, name: "47 - غرداية", home: 850, desk: 550 },
+            { id: 48, name: "48 - غليزان", home: 650, desk: 400 },
+            { id: 49, name: "49 - المغير", home: 900, desk: 600 },
+            { id: 50, name: "50 - المنيعة", home: 950, desk: 650 },
+            { id: 51, name: "51 - أولاد جلال", home: 850, desk: 550 },
+            { id: 52, name: "52 - برج باجي مختار", home: 1500, desk: 1000 },
+            { id: 53, name: "53 - بني عباس", home: 1100, desk: 750 },
+            { id: 54, name: "54 - تيميمون", home: 1100, desk: 750 },
+            { id: 55, name: "55 - تقرت", home: 900, desk: 600 },
+            { id: 56, name: "56 - جانت", home: 1500, desk: 1000 },
+            { id: 57, name: "57 - إن صالح", home: 1300, desk: 850 },
+            { id: 58, name: "58 - إن قزام", home: 1500, desk: 1000 }
+        ];
+
+        const products = [
+            {
+                id: 1,
+                title: "حذاء prada اسود",
+                price: "5500",
+                oldPrice: 6000,
+                badge: "خصم 25%",
+                description: "حذاء prada اسود منوفر بي افضل جودة في كل السوق",
+                images: [
+                    "img/IMG_3.jpg",
+                    "img/IMG_2.jpg",
+                    "img/IMG_1.jpg",
+                    "img/IMG_4.jpg"
+                ]
+            },
+
+            {
+                id: 2,
+                title: "حذاء LV اسود",
+                price: "5500",
+                oldPrice: 6000,
+                badge: "خصم 25%",
+                description: "حذاء LV اسود منوفر بي افضل جودة في كل السوق",
+                images: [
+                    "img/LV black.png"
+                ]
+            },
+        ];
+        let currentProduct = null;
+        let currentImageIndex = 0;
+
+        function populateWilayas() {
+            const select = document.getElementById('wilaya-select');
+            select.innerHTML = '<option value="">اختر ولايتك...</option>';
+            WILAYAS.forEach(w => {
+                const opt = document.createElement('option');
+                opt.value = w.id;
+                opt.textContent = w.name;
+                select.appendChild(opt);
+            });
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('products-container');
+            container.innerHTML = '';
+
+            products.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.onclick = () => openProductDetail(p.id);
+
+                const prodPrice = parseFloat(p.price) || 0;
+                const prodOldPrice = parseFloat(p.oldPrice) || 0;
+
+                card.innerHTML = `
+                    <div class="badge">${p.badge}</div>
+                    <img src="${p.images[0]}" class="card-img" alt="${p.title}">
+                    <div class="card-info">
+                        <div>
+                            <div class="rating">★★★★★</div>
+                            <h3 style="font-size: 15px; font-weight:700;">${p.title}</h3>
+                        </div>
+                        <div>
+                            <div class="price-container">
+                                <span class="product-price">${prodPrice.toLocaleString()} د.ج</span>
+                                <span class="old-price">${prodOldPrice.toLocaleString()} د.ج</span>
+                            </div>
+                            <button class="view-btn">عرض التفاصيل 🔍</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openProductDetail(productId) {
+            currentProduct = products.find(p => p.id === productId);
+            currentImageIndex = 0;
+
+            const prodPrice = parseFloat(currentProduct.price) || 0;
+            const prodOldPrice = parseFloat(currentProduct.oldPrice) || 0;
+
+            document.getElementById('detail-title').innerText = currentProduct.title;
+            document.getElementById('detail-price').innerText = `${prodPrice.toLocaleString()} د.ج`;
+            document.getElementById('detail-old-price').innerText = `${prodOldPrice.toLocaleString()} د.ج`;
+            document.getElementById('detail-desc').innerText = currentProduct.description;
+
+            updateGalleryView();
+
+            document.getElementById('catalog-page').classList.remove('active');
+            document.getElementById('detail-page').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showCatalog() {
+            document.getElementById('detail-page').classList.remove('active');
+            document.getElementById('catalog-page').classList.add('active');
+        }
+
+        function updateGalleryView() {
+            const mainImg = document.getElementById('viewer-main');
+            mainImg.src = currentProduct.images[currentImageIndex];
+
+            const thumbsContainer = document.getElementById('viewer-thumbs-container');
+            thumbsContainer.innerHTML = '';
+
+            currentProduct.images.forEach((img, idx) => {
+                const thumb = document.createElement('img');
+                thumb.src = img;
+                thumb.className = `viewer-thumb ${idx === currentImageIndex ? 'active' : ''}`;
+                thumb.onclick = () => {
+                    currentImageIndex = idx;
+                    updateGalleryView();
+                };
+                thumbsContainer.appendChild(thumb);
+            });
+        }
+
+        function navigateImage(direction) {
+            currentImageIndex += direction;
+            if (currentImageIndex >= currentProduct.images.length) currentImageIndex = 0;
+            if (currentImageIndex < 0) currentImageIndex = currentProduct.images.length - 1;
+            updateGalleryView();
+        }
+
+        function openOrderModal() {
+            const prodPrice = parseFloat(currentProduct.price) || 0;
+
+            document.getElementById('form-container').style.display = 'block';
+            document.getElementById('success-box').style.display = 'none';
+            document.getElementById('modal-product-title').innerText = `طلب: ${currentProduct.title}`;
+            document.getElementById('summary-price').innerText = `${prodPrice.toLocaleString()} د.ج`;
+            document.getElementById('wilaya-select').value = '';
+            document.getElementById('summary-shipping').innerText = '0 د.ج';
+            document.getElementById('summary-total').innerText = `${prodPrice.toLocaleString()} د.ج`;
+            document.getElementById('cust-note').value = '';
+            document.getElementById('order-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('order-modal').style.display = 'none';
+        }
+
+        // 🧮 تعديل عملية حساب سعر المنتج وسعر التوصيل والمجموع
+        function updateShippingCost() {
+            const wilayaId = parseInt(document.getElementById('wilaya-select').value);
+            const shippingType = document.querySelector('input[name="shipping_type"]:checked').value;
+            
+            let shippingCost = 0;
+            const selectedWilaya = WILAYAS.find(w => w.id === wilayaId);
+
+            if (selectedWilaya) {
+                shippingCost = shippingType === 'home' ? selectedWilaya.home : selectedWilaya.desk;
+            }
+
+            const productPriceNum = parseFloat(currentProduct.price) || 0;
+            const totalPrice = productPriceNum + shippingCost;
+
+            document.getElementById('summary-shipping').innerText = `${shippingCost.toLocaleString()} د.ج`;
+            document.getElementById('summary-total').innerText = `${totalPrice.toLocaleString()} د.ج`;
+        }
+
+        // ==========================================
+        // 🚀 دالة إرسال البيانات المباشرة إلى تليجرام
+        // ==========================================
+        async function submitOrderToTelegram(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.innerText = "جاري إرسال الطلب... ⏳";
+            submitBtn.disabled = true;
+
+            const name = document.getElementById('cust-name').value;
+            const phone = document.getElementById('cust-phone').value;
+            const wilayaSelect = document.getElementById('wilaya-select');
+            const wilayaName = wilayaSelect.options[wilayaSelect.selectedIndex].text;
+            const shippingType = document.querySelector('input[name="shipping_type"]:checked').value === 'home' ? 'توصيل للمنزل 🏠' : 'توصيل للمكتب 🏢';
+            const address = document.getElementById('cust-address').value;
+            const note = document.getElementById('cust-note').value.trim() || 'لا توجد ملاحظات';
+            const shippingCost = document.getElementById('summary-shipping').innerText;
+            const total = document.getElementById('summary-total').innerText;
+            const prodPriceNum = parseFloat(currentProduct.price) || 0;
+
+            // تنسيق الرسالة بأسلوب HTML جذاب
+            const textMessage = `🛍️ <b>طلب جديد من المتجر!</b>\n\n` +
+                                `📦 <b>المنتج:</b> ${currentProduct.title}\n` +
+                                `👤 <b>الاسم:</b> ${name}\n` +
+                                `📞 <b>رقم الهاتف:</b> <code>${phone}</code>\n` +
+                                `📍 <b>الولاية:</b> ${wilayaName}\n` +
+                                `🚚 <b>طريقة الشحن:</b> ${shippingType}\n` +
+                                `🏠 <b>العنوان:</b> ${address}\n` +
+                                `📝 <b>ملاحظة:</b> ${note}\n\n` +
+                                `💰 <b>سعر المنتج:</b> ${prodPriceNum.toLocaleString()} د.ج\n` +
+                                `🚚 <b>مصاريف التوصيل:</b> ${shippingCost}\n` +
+                                `💵 <b>المجموع الإجمالي:</b> <b>${total}</b>`;
+
+            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: textMessage,
+                        parse_mode: 'HTML'
+                    })
+                });
+
+                if (response.ok) {
+                    // إخفاء الاستمارة وإظهار شاشة النجاح للزبون
+                    document.getElementById('form-container').style.display = 'none';
+                    document.getElementById('success-box').style.display = 'block';
+                    document.getElementById('checkout-form').reset();
+                } else {
+                    alert("حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.");
+                }
+            } catch (err) {
+                alert("تعذر الاتصال بالشبكة، يرجى التأكد من اتصال الإنترنت.");
+            } finally {
+                submitBtn.innerText = "تأكيد الطلب 🚚";
+                submitBtn.disabled = false;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            populateWilayas();
+            renderProducts();
+        });
+    </script>
+</body>
+</html>
