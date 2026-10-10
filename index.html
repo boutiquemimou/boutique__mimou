@@ -420,6 +420,39 @@
             background-color: #f8fafc;
         }
 
+        .coupon-box {
+            display: flex;
+            gap: 8px;
+        }
+
+        .coupon-box input {
+            flex-grow: 1;
+        }
+
+        .coupon-btn {
+            background: var(--dark);
+            color: white;
+            border: none;
+            padding: 0 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .coupon-btn:hover {
+            background: var(--primary);
+        }
+
+        .coupon-msg {
+            font-size: 12px;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .coupon-msg.success { color: var(--primary); }
+        .coupon-msg.error { color: var(--accent); }
+
         .radio-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -462,7 +495,6 @@
             padding-top: 8px;
         }
 
-        /* رسالة النجاح بعد إرسال الطلب */
         .success-message {
             display: none;
             text-align: center;
@@ -481,6 +513,8 @@
             margin-bottom: 20px;
         }
     </style>
+    <!-- استدعاء ملف أكواد الخصم -->
+    <script src="coupons.js"></script>
 </head>
 <body>
 
@@ -503,7 +537,7 @@
             <div class="products-grid" id="products-container"></div>
         </section>
 
-        <!-- 2. صفحة تفاصيل المنتج والتنقل في الصور -->
+        <!-- 2. صفحة تفاصيل المنتج -->
         <section id="detail-page" class="page-section">
             <button class="back-btn" onclick="showCatalog()">➔ العودة للمتجر</button>
             <div class="product-detail-layout">
@@ -555,7 +589,7 @@
                     </div>
                     <div class="form-group">
                         <label>الولاية</label>
-                        <select id="wilaya-select" onchange="updateShippingCost()" required>
+                        <select id="wilaya-select" onchange="updateTotalCalculation()" required>
                             <option value="">اختر ولايتك...</option>
                         </select>
                     </div>
@@ -563,11 +597,11 @@
                         <label>مكان الاستلام</label>
                         <div class="radio-group">
                             <label class="radio-option">
-                                <input type="radio" name="shipping_type" value="home" checked onchange="updateShippingCost()">
+                                <input type="radio" name="shipping_type" value="home" checked onchange="updateTotalCalculation()">
                                 توصيل للمنزل
                             </label>
                             <label class="radio-option">
-                                <input type="radio" name="shipping_type" value="desk" onchange="updateShippingCost()">
+                                <input type="radio" name="shipping_type" value="desk" onchange="updateTotalCalculation()">
                                 توصيل للمكتب
                             </label>
                         </div>
@@ -576,7 +610,17 @@
                         <label>العنوان التفصيلي / البلدية</label>
                         <input type="text" id="cust-address" required placeholder="مثال: بلدية أولاد فايت">
                     </div>
-                    <!-- ✍️ مكان إضافة الملاحظة -->
+
+                    <!-- 🎟️ قسم كود الخصم الجديد -->
+                    <div class="form-group">
+                        <label>كود الخصم (إن وجد)</label>
+                        <div class="coupon-box">
+                            <input type="text" id="coupon-input" placeholder="أدخل الكود هنا...">
+                            <button type="button" class="coupon-btn" onclick="applyCoupon()">تطبيق</button>
+                        </div>
+                        <div id="coupon-msg" class="coupon-msg"></div>
+                    </div>
+
                     <div class="form-group">
                         <label>ملاحظة (اختياري)</label>
                         <textarea id="cust-note" rows="2" placeholder="أكتب المقاس، اللون المطلوب أو أي ملاحظات أخرى..."></textarea>
@@ -586,6 +630,10 @@
                         <div>
                             <span>سعر المنتج:</span>
                             <span id="summary-price">0 د.ج</span>
+                        </div>
+                        <div id="discount-row" style="display: none; color: var(--accent);">
+                            <span>قيمة الخصم:</span>
+                            <span id="summary-discount">-0 د.ج</span>
                         </div>
                         <div>
                             <span>مصاريف التوصيل:</span>
@@ -601,7 +649,6 @@
                 </form>
             </div>
 
-            <!-- رسالة شكر تظهر للزبون بعد نجاح الطلب -->
             <div id="success-box" class="success-message">
                 <h3>🎉 تم إرسال طلبك بنجاح!</h3>
                 <p>شكراً لثقتك بنا. سنتصل بك قريباً عبر الهاتف لتأكيد الطلب وبدء عملية الشحن.</p>
@@ -611,18 +658,9 @@
     </div>
 
     <script>
-        // ==========================================
-        // ⚙️ إعدادات تليجرام (ضع معلوماتك هنا)
-        // ==========================================
-        const TELEGRAM_BOT_TOKEN = "8709434736:AAGRhJuBNaEjG8H2Bbqwl2g0W-suhFAA2xo"; // التوكن الخاص بالبوت
-        const TELEGRAM_CHAT_ID = "8275297896";     // المعرف الخاص بحسابك
+        const TELEGRAM_BOT_TOKEN = "8709434736:AAGRhJuBNaEjG8H2Bbqwl2g0W-suhFAA2xo";
+        const TELEGRAM_CHAT_ID = "8275297896";
 
-        // صور توضيحية افتراضية
-        const IMG_1 = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="500" height="400" viewBox="0 0 500 400"><rect width="100%" height="100%" fill="%23008751"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="28" font-family="sans-serif">الصورة الأولى</text></svg>';
-        const IMG_2 = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="500" height="400" viewBox="0 0 500 400"><rect width="100%" height="100%" fill="%231e293b"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="28" font-family="sans-serif">الصورة الثانية</text></svg>';
-        const IMG_3 = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="500" height="400" viewBox="0 0 500 400"><rect width="100%" height="100%" fill="%23e30613"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="28" font-family="sans-serif">الصورة الثالثة</text></svg>';
-
-        /* 58 ولاية جزائرية كاملاً مع أسعار توصيل المنزل والمكتب */
         const WILAYAS = [
             { id: 1, name: "01 - أدرار", home: 1000, desk: 600 },
             { id: 2, name: "02 - الشلف", home: 600, desk: 400 },
@@ -692,14 +730,8 @@
                 oldPrice: 6000,
                 badge: "خصم 25%",
                 description: "حذاء prada اسود منوفر بي افضل جودة في كل السوق",
-                images: [
-                    "img/IMG_3.jpg",
-                    "img/IMG_2.jpg",
-                    "img/IMG_1.jpg",
-                    "img/IMG_4.jpg"
-                ]
+                images: ["img/IMG_3.jpg", "img/IMG_2.jpg", "img/IMG_1.jpg", "img/IMG_4.jpg"]
             },
-
             {
                 id: 2,
                 title: "حذاء LV اسود",
@@ -707,11 +739,8 @@
                 oldPrice: 6000,
                 badge: "خصم 25%",
                 description: "حذاء LV اسود منوفر بي افضل جودة في كل السوق",
-                images: [
-                    "img/LV black.png"
-                ]
+                images: ["img/LV black.png"]
             },
-
             {
                 id: 3,
                 title: "حذاء LV ابيض و اسود",
@@ -719,11 +748,8 @@
                 oldPrice: 6000,
                 badge: "خصم 25%",
                 description: "حذاء LV اسود و ابيض منوفر بي افضل جودة في كل السوق",
-                images: [
-                    "img/LV biad and black.jpg"
-                ]
+                images: ["img/LV biad and black.jpg"]
             },
-
             {
                 id: 4,
                 title: "قميص BALENCISKA ابيض",
@@ -731,15 +757,13 @@
                 oldPrice: 6000,
                 badge: "خصم 25%",
                 description: "قميص BALENCISKA ابيض متوفر بي افضل جودة في السوق",
-                images: [
-                    "img/trko taskit.jpg",
-                    "img/trko taskit (2).jpg",
-                    "img/trko taskit (3).jpg"
-                ]
+                images: ["img/trko taskit.jpg", "img/trko taskit (2).jpg", "img/trko taskit (3).jpg"]
             }
         ];
+
         let currentProduct = null;
         let currentImageIndex = 0;
+        let appliedCoupon = null; // تخزين معلومات الكوبون المفعل
 
         function populateWilayas() {
             const select = document.getElementById('wilaya-select');
@@ -755,12 +779,10 @@
         function renderProducts() {
             const container = document.getElementById('products-container');
             container.innerHTML = '';
-
             products.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.onclick = () => openProductDetail(p.id);
-
                 const prodPrice = parseFloat(p.price) || 0;
                 const prodOldPrice = parseFloat(p.oldPrice) || 0;
 
@@ -788,7 +810,6 @@
         function openProductDetail(productId) {
             currentProduct = products.find(p => p.id === productId);
             currentImageIndex = 0;
-
             const prodPrice = parseFloat(currentProduct.price) || 0;
             const prodOldPrice = parseFloat(currentProduct.oldPrice) || 0;
 
@@ -798,7 +819,6 @@
             document.getElementById('detail-desc').innerText = currentProduct.description;
 
             updateGalleryView();
-
             document.getElementById('catalog-page').classList.remove('active');
             document.getElementById('detail-page').classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -812,10 +832,8 @@
         function updateGalleryView() {
             const mainImg = document.getElementById('viewer-main');
             mainImg.src = currentProduct.images[currentImageIndex];
-
             const thumbsContainer = document.getElementById('viewer-thumbs-container');
             thumbsContainer.innerHTML = '';
-
             currentProduct.images.forEach((img, idx) => {
                 const thumb = document.createElement('img');
                 thumb.src = img;
@@ -837,6 +855,7 @@
 
         function openOrderModal() {
             const prodPrice = parseFloat(currentProduct.price) || 0;
+            appliedCoupon = null; // إعادة تعيين الكوبون عند فتح نافذة جديدة
 
             document.getElementById('form-container').style.display = 'block';
             document.getElementById('success-box').style.display = 'none';
@@ -844,8 +863,12 @@
             document.getElementById('summary-price').innerText = `${prodPrice.toLocaleString()} د.ج`;
             document.getElementById('wilaya-select').value = '';
             document.getElementById('summary-shipping').innerText = '0 د.ج';
-            document.getElementById('summary-total').innerText = `${prodPrice.toLocaleString()} د.ج`;
+            document.getElementById('coupon-input').value = '';
+            document.getElementById('coupon-msg').innerText = '';
+            document.getElementById('discount-row').style.display = 'none';
             document.getElementById('cust-note').value = '';
+            
+            updateTotalCalculation();
             document.getElementById('order-modal').style.display = 'flex';
         }
 
@@ -853,27 +876,81 @@
             document.getElementById('order-modal').style.display = 'none';
         }
 
-        // 🧮 تعديل عملية حساب سعر المنتج وسعر التوصيل والمجموع
-        function updateShippingCost() {
+        // 🎟️ دالة التحقق وتطبيق كود الخصم
+        function applyCoupon() {
+            const codeInput = document.getElementById('coupon-input').value.trim();
+            const msgEl = document.getElementById('coupon-msg');
+            
+            const coupon = COUPONS.find(c => c.code.toLowerCase() === codeInput.toLowerCase());
+
+            if (!coupon) {
+                msgEl.className = "coupon-msg error";
+                msgEl.innerText = "❌ كود الخصم غير صالح.";
+                appliedCoupon = null;
+                updateTotalCalculation();
+                return;
+            }
+
+            if (coupon.usesLeft <= 0) {
+                msgEl.className = "coupon-msg error";
+                msgEl.innerText = "❌ لقد انتهت صلاحية هذا الكود (استنفذ عدد مرات الاستخدام).";
+                appliedCoupon = null;
+                updateTotalCalculation();
+                return;
+            }
+
+            if (coupon.productId !== null && coupon.productId !== currentProduct.id) {
+                msgEl.className = "coupon-msg error";
+                msgEl.innerText = "❌ هذا الكود غير مخصص لهذا المنتج.";
+                appliedCoupon = null;
+                updateTotalCalculation();
+                return;
+            }
+
+            appliedCoupon = coupon;
+            msgEl.className = "coupon-msg success";
+            msgEl.innerText = "✅ تم تطبيق الكود بنجاح!";
+            updateTotalCalculation();
+        }
+
+        // 🧮 حساب الأسعار والمصاريف والخصم والمجموع
+        function updateTotalCalculation() {
             const wilayaId = parseInt(document.getElementById('wilaya-select').value);
             const shippingType = document.querySelector('input[name="shipping_type"]:checked').value;
             
             let shippingCost = 0;
             const selectedWilaya = WILAYAS.find(w => w.id === wilayaId);
-
             if (selectedWilaya) {
                 shippingCost = shippingType === 'home' ? selectedWilaya.home : selectedWilaya.desk;
             }
 
             const productPriceNum = parseFloat(currentProduct.price) || 0;
-            const totalPrice = productPriceNum + shippingCost;
+            let discountAmount = 0;
+
+            if (appliedCoupon) {
+                if (appliedCoupon.discountType === 'fixed') {
+                    discountAmount = appliedCoupon.discountValue;
+                } else if (appliedCoupon.discountType === 'percent') {
+                    discountAmount = (productPriceNum * appliedCoupon.discountValue) / 100;
+                }
+                // ضمان عدم تجاوز الخصم لسعر المنتج
+                if (discountAmount > productPriceNum) discountAmount = productPriceNum;
+
+                document.getElementById('discount-row').style.display = 'flex';
+                document.getElementById('summary-discount').innerText = `-${discountAmount.toLocaleString()} د.ج`;
+            } else {
+                document.getElementById('discount-row').style.display = 'none';
+            }
+
+            const finalProductPrice = productPriceNum - discountAmount;
+            const totalPrice = finalProductPrice + shippingCost;
 
             document.getElementById('summary-shipping').innerText = `${shippingCost.toLocaleString()} د.ج`;
             document.getElementById('summary-total').innerText = `${totalPrice.toLocaleString()} د.ج`;
         }
 
         // ==========================================
-        // 🚀 دالة إرسال البيانات المباشرة إلى تليجرام
+        // 🚀 إرسال الطلب إلى تليجرام مع خصم عدد المرات
         // ==========================================
         async function submitOrderToTelegram(e) {
             e.preventDefault();
@@ -893,7 +970,13 @@
             const total = document.getElementById('summary-total').innerText;
             const prodPriceNum = parseFloat(currentProduct.price) || 0;
 
-            // تنسيق الرسالة بأسلوب HTML جذاب
+            let couponText = "لا يوجد";
+            if (appliedCoupon) {
+                couponText = `${appliedCoupon.code} (خصم مفعّل)`;
+                // تقليل عدد مرات الاستخدام المتبقية للكود
+                appliedCoupon.usesLeft--;
+            }
+
             const textMessage = `🛍️ <b>طلب جديد من المتجر!</b>\n\n` +
                                 `📦 <b>المنتج:</b> ${currentProduct.title}\n` +
                                 `👤 <b>الاسم:</b> ${name}\n` +
@@ -901,6 +984,7 @@
                                 `📍 <b>الولاية:</b> ${wilayaName}\n` +
                                 `🚚 <b>طريقة الشحن:</b> ${shippingType}\n` +
                                 `🏠 <b>العنوان:</b> ${address}\n` +
+                                `🎟️ <b>كود الخصم:</b> ${couponText}\n` +
                                 `📝 <b>ملاحظة:</b> ${note}\n\n` +
                                 `💰 <b>سعر المنتج:</b> ${prodPriceNum.toLocaleString()} د.ج\n` +
                                 `🚚 <b>مصاريف التوصيل:</b> ${shippingCost}\n` +
@@ -920,7 +1004,6 @@
                 });
 
                 if (response.ok) {
-                    // إخفاء الاستمارة وإظهار شاشة النجاح للزبون
                     document.getElementById('form-container').style.display = 'none';
                     document.getElementById('success-box').style.display = 'block';
                     document.getElementById('checkout-form').reset();
