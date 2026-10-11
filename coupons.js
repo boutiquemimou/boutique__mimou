@@ -14,6 +14,6 @@ const COUPONS = [
         discountType: "fixed",
         discountValue: 500,     // خصم 15%
         usesLeft: 1,
-        productId: 1           // صالح فقط للمنتج رقم 1 (حذاء prada اسود)
+        productId: 500           // صالح فقط للمنتج رقم 1 (حذاء prada اسود)
     }
 ];
