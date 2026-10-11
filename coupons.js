@@ -12,8 +12,8 @@ const COUPONS = [
     {
         code: "PRADA2026",
         discountType: "fixed",
-        discountValue: 500,     // خصم 15%
-        usesLeft: 1,
+        discountValue: 300,     // خصم 15%
+        usesLeft: 5,
         productId: 1           // صالح فقط للمنتج رقم 1 (حذاء prada اسود)
     }
 ];
